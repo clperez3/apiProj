@@ -1,16 +1,25 @@
 {
   "dependencies": {
     "axios": "^0.21.1",
-    "jquery": "^3.6.0"
+    "jquery": "^3.6.0",
+    "unirest": "^0.6.0"
   },
   "name": "comp426final",
   "version": "1.0.0",
   "main": "script.js",
-  "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "console": "run_in_console.js"
   },
   "author": "",
   "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clperez3/apiProj.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clperez3/apiProj/issues"
+  },
+  "homepage": "https://github.com/clperez3/apiProj#readme",
   "description": ""
 }

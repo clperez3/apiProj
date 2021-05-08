@@ -1,4 +1,5 @@
 export default class Game{
+    //game = {board, isrevealed, onMove, firstReveal,totalMatched, onWinCalls, totalMoves}
     constructor(width){
         let size = width*width;
         this.board = new Array(size);
@@ -10,9 +11,11 @@ export default class Game{
         this.onMove=false;
         this.firstReveal=0;
         this.totalMatched=0;
+        this.totalMoves=0;
 
 
         this.onWinCalls = [];
+
 
         let board = this.board;
         let pairs = size/2;
@@ -52,7 +55,7 @@ export default class Game{
     won(){
         if(this.onWinCalls !== undefined){
             this.onWinCalls.forEach(fn=>{
-                fn();
+                fn(this);
             })
         }
     }
@@ -69,6 +72,7 @@ export default class Game{
                 this.firstReveal=position;
                 this.onMove=true;
             }else{
+                this.totalMoves++;
                 if(this.board[this.firstReveal] === this.board[position]){
                     this.totalMatched +=2;
                     if(this.totalMatched == this.board.length){
@@ -82,6 +86,10 @@ export default class Game{
             }
         }  
         return;
+    }
+
+    getTotalMoves(){
+        return this.totalMoves;
     }
 
     onWin(fn){

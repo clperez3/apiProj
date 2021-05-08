@@ -1,0 +1,50 @@
+td{
+
+    text-align: center;
+    border: solid;
+    width: 100px;
+    height:90px;
+    margin: 10px;
+}
+
+table{
+    table-layout: fixed;
+    border-style: solid;
+    border:1px;
+    border-color: black;
+    border-spacing: 100px;
+    width: 180px;
+    height: 180px;
+
+
+    margin-left: auto;
+    margin-right: auto;
+
+}
+.fill {
+    display: fixed;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden
+}
+.fill img {
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%
+}
+div{
+    padding: 10px;
+    margin: 10px;
+}
+#win{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#scoreBoard{
+    border-style: solid;
+    width:150px;
+}
+h1{
+    font-size: larger;
+}

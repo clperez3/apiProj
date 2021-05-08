@@ -1,13 +1,16 @@
-import {getVegan} from '/requests.js'
 import Game from './engine/game.js'
 import GameView from './engine/gameView.js';
 import GameController from './engine/controller.js';
+
+import {getNumTrivia, getDoggo, getRecipeByTime, getRecipeByID, getTrivia} from './requests.js';
+
+
 window.addEventListener('load', async()=>{
 
     let pickNumDiv = document.createElement('div');
     {
         let label = document.createElement('label');
-        label.innerHTML = 'Pick a number between 1 and 10. The closer the number, the easier the game!';
+        label.innerHTML = 'Pick a number between 1 and 10 to begin. The closer the guess, the easier the game! You will get a recipe to make at the end, but the longer the game takes you, the harder the recipe will be to make.';
         label.for = 'pickNum';
         let input = document.createElement('input');
         input.type = 'number';
@@ -20,6 +23,7 @@ window.addEventListener('load', async()=>{
         button.type = 'submit';
         button.innerHTML = 'Guess!';
         $('#main').append(label);
+        $('#main').append(document.createElement('div'));
         $('#main').append(input);
         $('#main').append(button);
 
@@ -28,20 +32,12 @@ window.addEventListener('load', async()=>{
 
     }
 
-    // let request = await getVegan();
 
-    // let data = await request.data['results'];
-    // alert(data.length);
-    // data.forEach(recipe => {
-    //     let p = document.createElement('p');
-    //     p.innerHTML = recipe.title;
-    //     $('#content').append(p);
-    // });
 });
 
 function guessClick(){
     $('#gameBoard').children().remove();
-    let randomNum = Math.floor(Math.random()*10);
+    let randomNum = Math.ceil(Math.random()*10);
     let guess = $('#pick')[0].value;
     let diff = Math.abs(randomNum-guess);
 
@@ -76,12 +72,105 @@ function guessClick(){
 }, 1000);
 }
 
-function generateGame(diff){
-    let boardGame = new Game(diff);
-    let boardView = new GameView(boardGame);
+async function generateGame(diff){
+    diff=2;
+    if(diff%2 !== 0){
+        diff +=1;
+    }
+    let gameWidth = diff;
+    let numOfPairs = gameWidth*gameWidth/2;
+
+    let promptArr = [];
+    let ansArr = [];
+
+    if(diff > 90){
+        let min = Math.floor(Math.random()*50);
+        let max = min + numOfPairs;
+        let request = await getNumTrivia(min,max);
+        for(let i=min; i < max; i++){
+            let pos = i-min;
+            let content = request[i];
+            //create prompt
+            promptArr[pos] = i;
+
+            //create answer
+            let indx = content.indexOf("is");
+            ansArr[pos] = content.substring(indx);
+        }
+    } else if(diff > 0){
+        let request = await getTrivia();
+        let data = request['results'];
+        for(let i=0; i<numOfPairs; i++){
+            promptArr[i] = data[i]['question'];
+            ansArr[i] = data[i]['correct_answer'];
+        }
+
+    } else if(false){
+
+    } else if (diff > 0){
+        for(let i=0; i<numOfPairs; i++){
+            let request = await getDoggo();
+            let content = request['message'];
+            promptArr[i] = "<img class='fill' src=" + content+ '>';
+            ansArr[i] = "<img class='fill' src="+ content+ '>';
+
+        }
+
+    }
+
+
+    let boardGame = new Game(gameWidth);
+    let boardView = new GameView(boardGame, promptArr, ansArr);
     let boardControl = new GameController(boardGame, boardView);
 
-
+    boardGame.onWin(wonGame);
     $('#gameBoard').append(boardView.getView());
+
+}
+
+function wonGame(game){
+    setTimeout(()=>{
+        $('#gameBoard').children().remove();
+        appendWin(game.getTotalMoves());
+    },1500);
+}
+
+async function appendWin(moves){
+    let requesta = await getRecipeByTime(moves*2);
+
+    let data = requesta['results'];
+    let recipe = data[0];
+    let recipeID = recipe['id'];
+
+    let requestb = await getRecipeByID(recipeID);
+    let link = requestb['sourceUrl'];
+    let min = requestb['readyInMinutes'];
+
+    let head = document.createElement('h2');
+    head.innerHTML = "Good Job! You get to make...";
+
+    let p = document.createElement('h1');
+    p.innerHTML = recipe['title'];
+
+    let img = document.createElement('img');
+    img.src = recipe['image'];
+
+    let h = document.createElement('p');
+    h.innerHTML = 'Ready in ' + min+ ' minutes!';
+
+    let winScreen = document.createElement('a');
+    winScreen.id = '#win';
+    winScreen.href = link;
+    winScreen.appendChild(head);
+    winScreen.appendChild(p);
+    winScreen.appendChild(img);
+    winScreen.appendChild(h);
+
+    $('#gameBoard').append(winScreen);
+
+
+
+
+
 
 }
