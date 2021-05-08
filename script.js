@@ -53,7 +53,7 @@ function guessClick(){
         responseDiv.innerHTML = 'So close, but the number was ';
         responseDiv.appendChild(num);
         let a = document.createElement('p');
-        a.innerHTML = "Good luck! Shouldn't be too bad...";
+        a.innerHTML = "Good luck!";
         responseDiv.append(a);
     } else {
         let num = document.createElement('strong');
@@ -73,68 +73,79 @@ function guessClick(){
 }
 
 async function generateGame(diff){
-    if(diff>7){
-        diff =6;
-    } else if (diff > 4){
-        diff = 4;
-    } else {
-        diff = 4;
+    if(diff===0){
+        appendWin(0);
+    } else{
+
+    
+        if(diff>7){
+            diff =6;
+        } else if (diff > 4){
+            diff = 4;
+        } else {
+            diff = 4;
+        }
+
+        let gameWidth = diff;
+        let numOfPairs = gameWidth*gameWidth/2;
+
+        let promptArr = [];
+        let ansArr = [];
+        let playInfo = document.createElement('em');
+        playInfo.style.marginLeft = 'auto';
+        playInfo.style.marginRight = 'auto';
+        playInfo.style.textAlign = 'center';
+
+
+
+        if(diff === 6){
+            let min = Math.floor(Math.random()*50);
+            let max = min + numOfPairs;
+            let request = await getNumTrivia(min,max);
+            for(let i=min; i < max; i++){
+                let pos = i-min;
+                let content = request[i];
+                //create prompt
+                promptArr[pos] = i;
+
+                //create answer
+                let indx = content.indexOf("is");
+                ansArr[pos] = content.substring(indx);
+                playInfo.innerHTML = 'Match the number trivia question to its answer.'
+
+
+            }
+        } else if(diff === 5){
+            let request = await getTrivia();
+            let data = request['results'];
+            for(let i=0; i<numOfPairs; i++){
+                promptArr[i] = data[i]['question'];
+                ansArr[i] = data[i]['correct_answer'];
+            }
+            playInfo.innerHTML = 'Match the trivia question to its answer.'
+
+        } else {
+            for(let i=0; i<numOfPairs; i++){
+                let request = await getDoggo();
+                let content = request['message'];
+                promptArr[i] = "<img class='fill' src=" + content+ '>';
+                ansArr[i] = "<img class='fill' src="+ content+ '>';
+
+            }
+            playInfo.innerHTML = 'Match the dog to its identical picture.'
+
+        }
+
+        $('#gameBoard').append(playInfo);
+
+
+        let boardGame = new Game(gameWidth);
+        let boardView = new GameView(boardGame, promptArr, ansArr);
+        let boardControl = new GameController(boardGame, boardView);
+
+        boardGame.onWin(wonGame);
+        $('#gameBoard').append(boardView.getView());
     }
-
-    let gameWidth = diff;
-    let numOfPairs = gameWidth*gameWidth/2;
-
-    let promptArr = [];
-    let ansArr = [];
-    let playInfo = document.createElement('div');
-
-    if(diff === 6){
-        let min = Math.floor(Math.random()*50);
-        let max = min + numOfPairs;
-        let request = await getNumTrivia(min,max);
-        for(let i=min; i < max; i++){
-            let pos = i-min;
-            let content = request[i];
-            //create prompt
-            promptArr[pos] = i;
-
-            //create answer
-            let indx = content.indexOf("is");
-            ansArr[pos] = content.substring(indx);
-            playInfo.innerHTML = 'Match the number trivia question to its answer.'
-
-
-        }
-    } else if(diff === 5){
-        let request = await getTrivia();
-        let data = request['results'];
-        for(let i=0; i<numOfPairs; i++){
-            promptArr[i] = data[i]['question'];
-            ansArr[i] = data[i]['correct_answer'];
-        }
-        playInfo.innerHTML = 'Match the trivia question to its answer.'
-
-    } else {
-        for(let i=0; i<numOfPairs; i++){
-            let request = await getDoggo();
-            let content = request['message'];
-            promptArr[i] = "<img class='fill' src=" + content+ '>';
-            ansArr[i] = "<img class='fill' src="+ content+ '>';
-
-        }
-        playInfo.innerHTML = 'Match the dog to its identical picture.'
-
-    }
-
-    $('#gameBoard').append(playInfo);
-
-
-    let boardGame = new Game(gameWidth);
-    let boardView = new GameView(boardGame, promptArr, ansArr);
-    let boardControl = new GameController(boardGame, boardView);
-
-    boardGame.onWin(wonGame);
-    $('#gameBoard').append(boardView.getView());
 
 }
 
@@ -146,10 +157,10 @@ function wonGame(game){
 }
 
 async function appendWin(moves){
-    let requesta = await getRecipeByTime(moves*2);
+    let requesta = await getRecipeByTime(moves*2+5);
 
     let data = requesta['results'];
-    let recipe = data[0];
+    let recipe = data[1];
     let recipeID = recipe['id'];
 
     let requestb = await getRecipeByID(recipeID);

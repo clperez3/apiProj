@@ -38,20 +38,7 @@ export default class Game{
             }
         }
     }
-    move(card0, card1){
-        let board = this.board;
-        if(board[card0] === board[card1]){
-            this.isRevealed[card0] = true;
-            this.isRevealed[card1] = true;
-            this.totalMatched +=1;
-        }
 
-        if(this.totalRevealed == board.length){
-            this.won();
-        }
-
-        
-    }
     won(){
         if(this.onWinCalls !== undefined){
             this.onWinCalls.forEach(fn=>{
