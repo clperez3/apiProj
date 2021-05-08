@@ -44,7 +44,7 @@ async function getDoggo(){
 
 async function getTrivia(){
     let request = await axios({
-        url: 'https://opentdb.com/api.php?amount=10',
+        url: 'https://opentdb.com/api.php?amount=15',
         method: 'get',
     });
 

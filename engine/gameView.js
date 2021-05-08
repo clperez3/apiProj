@@ -63,9 +63,9 @@ export default class GameView{
         score.id = 'score';
         score.innerHTML = game.getTotalMoves();
         scoreBoard.appendChild(score);
+        $('#gameBoard').append(boardTable);
 
         $('#gameBoard').append(scoreBoard);
-        $('#gameBoard').append(boardTable);
         this.div = $('#gameBoard')[0];
         $('td').on('click', this, this.revealCell);
 

@@ -10,7 +10,7 @@ window.addEventListener('load', async()=>{
     let pickNumDiv = document.createElement('div');
     {
         let label = document.createElement('label');
-        label.innerHTML = 'Pick a number between 1 and 10 to begin. The closer the guess, the easier the game! You will get a recipe to make at the end, but the longer the game takes you, the harder the recipe will be to make.';
+        label.innerHTML = 'Pick a number between 1 and 10 to begin. The closer the guess, the easier the game! You will get a recipe to make at the end, but the longer the game takes you, the harder the recipe will be to make. ';
         label.for = 'pickNum';
         let input = document.createElement('input');
         input.type = 'number';
@@ -22,10 +22,12 @@ window.addEventListener('load', async()=>{
         button.id = 'submitGuess';
         button.type = 'submit';
         button.innerHTML = 'Guess!';
+        let guessDiv = document.createElement('div');
+        guessDiv.append(input);
+        guessDiv.append(button);
         $('#main').append(label);
-        $('#main').append(document.createElement('div'));
-        $('#main').append(input);
-        $('#main').append(button);
+        $('#main').append(guessDiv);
+
 
         $('#submitGuess').on('click', guessClick);
 
@@ -78,10 +80,10 @@ async function generateGame(diff){
     } else{
 
     
-        if(diff>7){
+        if(diff>8){
             diff =6;
         } else if (diff > 4){
-            diff = 4;
+            diff = 5;
         } else {
             diff = 4;
         }
@@ -116,10 +118,15 @@ async function generateGame(diff){
 
             }
         } else if(diff === 5){
+            diff=4;
+            gameWidth = diff;
+            numOfPairs = gameWidth*gameWidth/2;
             let request = await getTrivia();
             let data = request['results'];
             for(let i=0; i<numOfPairs; i++){
+
                 promptArr[i] = data[i]['question'];
+
                 ansArr[i] = data[i]['correct_answer'];
             }
             playInfo.innerHTML = 'Match the trivia question to its answer.'
@@ -135,6 +142,8 @@ async function generateGame(diff){
             playInfo.innerHTML = 'Match the dog to its identical picture.'
 
         }
+
+        playInfo.style.textAlign = 'center';
 
         $('#gameBoard').append(playInfo);
 
@@ -160,7 +169,7 @@ async function appendWin(moves){
     let requesta = await getRecipeByTime(moves*2+5);
 
     let data = requesta['results'];
-    let recipe = data[1];
+    let recipe = data[Math.floor(Math.random()*4)];
     let recipeID = recipe['id'];
 
     let requestb = await getRecipeByID(recipeID);
