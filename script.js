@@ -73,17 +73,22 @@ function guessClick(){
 }
 
 async function generateGame(diff){
-    diff=2;
-    if(diff%2 !== 0){
-        diff +=1;
+    if(diff>7){
+        diff =6;
+    } else if (diff > 4){
+        diff = 4;
+    } else {
+        diff = 4;
     }
+
     let gameWidth = diff;
     let numOfPairs = gameWidth*gameWidth/2;
 
     let promptArr = [];
     let ansArr = [];
+    let playInfo = document.createElement('div');
 
-    if(diff > 90){
+    if(diff === 6){
         let min = Math.floor(Math.random()*50);
         let max = min + numOfPairs;
         let request = await getNumTrivia(min,max);
@@ -96,18 +101,20 @@ async function generateGame(diff){
             //create answer
             let indx = content.indexOf("is");
             ansArr[pos] = content.substring(indx);
+            playInfo.innerHTML = 'Match the number trivia question to its answer.'
+
+
         }
-    } else if(diff > 0){
+    } else if(diff === 5){
         let request = await getTrivia();
         let data = request['results'];
         for(let i=0; i<numOfPairs; i++){
             promptArr[i] = data[i]['question'];
             ansArr[i] = data[i]['correct_answer'];
         }
+        playInfo.innerHTML = 'Match the trivia question to its answer.'
 
-    } else if(false){
-
-    } else if (diff > 0){
+    } else {
         for(let i=0; i<numOfPairs; i++){
             let request = await getDoggo();
             let content = request['message'];
@@ -115,8 +122,11 @@ async function generateGame(diff){
             ansArr[i] = "<img class='fill' src="+ content+ '>';
 
         }
+        playInfo.innerHTML = 'Match the dog to its identical picture.'
 
     }
+
+    $('#gameBoard').append(playInfo);
 
 
     let boardGame = new Game(gameWidth);
